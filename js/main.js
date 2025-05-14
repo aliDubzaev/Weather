@@ -8,7 +8,7 @@ const humidity = document.getElementById('humidity');
 const wind = document.getElementById('wind');
 const icon = document.querySelector('.card__weather-icon');
 const date = document.getElementById('date');
-
+const loadingElement = document.querySelector('.card__loading'); 
 
 const showDate = () => {
   const now = new Date();
@@ -22,12 +22,18 @@ async function getWeather(city) {
   if (!city) return;
 
   try {
+    card.classList.add('card--loading');
+    searchBtn.disabled = true;
+    searchBox.disabled = true;
+    
     const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
     
     if (!response.ok) throw new Error('Город не найден');
 
     const result = await response.json();
 
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     card.classList.add('active');
     card.style.height = '530px';
 
@@ -43,6 +49,10 @@ async function getWeather(city) {
 
   } catch (err) {
     alert(err);
+  } finally {
+    card.classList.remove('card--loading');
+    searchBtn.disabled = false;
+    searchBox.disabled = false;
   }
 }
 
@@ -50,10 +60,9 @@ searchBtn.addEventListener('click',() => {
   getWeather(searchBox.value);
 });
 
-
 searchBox.addEventListener('keypress',(e) => {
   if (e.key === 'Enter') {
-  getWeather(searchBox.value);
+    getWeather(searchBox.value);
   }
 });
 
